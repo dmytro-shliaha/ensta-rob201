@@ -9,17 +9,29 @@ def reactive_obst_avoid(lidar):
     Simple obstacle avoidance
     lidar : placebot object with lidar data
     """
-    # TODO for TP1
+    laser_distances = lidar.get_sensor_values()
+    laser_angles = lidar.get_ray_angles()
 
-    laser_dist = lidar.get_sensor_values()
-    speed = 0.0
-    rotation_speed = 0.0
+    # Afficher les résultats reçus des capteurs
+    # print("Laser distances:", laser_distances)
+    # print("Laser angles:", laser_angles * 180 / np.pi) # Convert radians to degrees
 
-    command = {"forward": speed,
-               "rotation": rotation_speed}
+    idx = np.where(np.isclose(laser_angles, 0))[0]
+    # print("Indices of angles close to 0°:", idx)
+    distance_at_zero = laser_distances[idx[0]]
 
+    # Vérification de la distance en face
+    if distance_at_zero <= 20:
+        # Obstacle détecté : arrête l'avance et tourne d'un angle aléatoire entre 0 et 1
+        # command = {"forward": 0.5, "rotation": random.uniform(0, 1)}
+
+        # Si la distance n'est pas acceptable, on commande une rotation de 0.5
+        command = {"forward": 0.5, "rotation": 0.5}
+    else:
+        # Distance acceptable : avancer sans rotation
+        command = {"forward": 0.5, "rotation": 0.0}
+    
     return command
-
 
 def potential_field_control(lidar, current_pose, goal_pose):
     """
